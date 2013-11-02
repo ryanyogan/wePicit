@@ -54,6 +54,7 @@
 
 - (IBAction) logoutPressed:(id)sender
 {
+    [PFUser logOut];
     [self.navigationController popViewControllerAnimated:YES];
 }
 
