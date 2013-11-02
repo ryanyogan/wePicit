@@ -23,6 +23,7 @@
 
 - (void) viewDidLoad
 {
+    [PFUser logOut];
 	[super viewDidLoad];
 }
 

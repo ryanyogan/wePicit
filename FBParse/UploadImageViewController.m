@@ -9,7 +9,7 @@
 #import "UploadImageViewController.h"
 #import "UIImage+Scaling.h"
 
-@interface UploadImageViewController () <UINavigationControllerDelegate, UIImagePickerControllerDelegate, UITextViewDelegate>
+@interface UploadImageViewController () <UINavigationControllerDelegate, UIImagePickerControllerDelegate, UITextViewDelegate, CommsDelegate>
 @property (nonatomic, strong) IBOutlet UILabel *lblChooseAnImage;
 @property (nonatomic, strong) IBOutlet UIImageView *imgToUpload;
 @property (nonatomic, strong) IBOutlet UIButton *btnPhotoAlbum;
@@ -86,6 +86,9 @@
 	
 	// Show progress
 	[_vProgressUpload setHidden:NO];
+    
+    // Upload the image to Parse
+    [Comms uploadImage:self.imgToUpload.image withComment:_txtComment.text forDelegate:self];
 }
 
 #pragma mark - UIImagePickerControllerDelegate
@@ -113,5 +116,30 @@
     return YES;
 }
 
+- (void) commsUploadImageComplete:(BOOL)success
+{
+	// Reset the UI
+	[_vProgressUpload setHidden:YES];
+	[_btnUpload setEnabled:YES];
+	[_lblChooseAnImage setHidden:NO];
+	[_imgToUpload setImage:nil];
+    
+	// Did the upload work ?
+	if (success) {
+		[self.navigationController popViewControllerAnimated:YES];
+	} else {
+		[[[UIAlertView alloc] initWithTitle:@"Upload Error"
+                                    message:@"Error uploading image. Please try again."
+                                   delegate:nil
+                          cancelButtonTitle:@"Ok"
+                          otherButtonTitles:nil] show];
+	}
+}
+
+- (void) commsUploadImageProgress:(short)progress
+{
+	NSLog(@"Uploaded: %d%%", progress);
+	[_progressUpload setProgress:(progress/100.0f)];
+}
 
 @end
